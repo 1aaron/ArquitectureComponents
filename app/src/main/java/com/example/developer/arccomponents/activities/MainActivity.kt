@@ -8,6 +8,10 @@ import android.view.MenuItem
 import com.example.developer.arccomponents.R
 
 import kotlinx.android.synthetic.main.activity_main.*
+import android.support.v7.widget.LinearLayoutManager
+import com.example.developer.arccomponents.adapters.WordListAdapter
+import kotlinx.android.synthetic.main.content_main.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,6 +19,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        val adapter = WordListAdapter(this)
+        recyclerview.adapter = adapter
+        recyclerview.layoutManager = LinearLayoutManager(this)
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
