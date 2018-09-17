@@ -7,6 +7,12 @@ import android.content.Context
 import com.example.developer.arccomponents.Daos.WordDao
 import com.example.developer.arccomponents.R
 import com.example.developer.arccomponents.entities.Word
+import android.arch.persistence.db.SupportSQLiteDatabase
+import android.os.AsyncTask
+
+
+
+
 
 
 
@@ -20,11 +26,34 @@ abstract class WordRoomDatabase: RoomDatabase() {
             if (INSTANCE == null) {
                 synchronized(WordRoomDatabase::class.java) {
                     if (INSTANCE == null) {
-                        INSTANCE = Room.databaseBuilder(context.applicationContext,WordRoomDatabase::class.java,context.getString(R.string.dbName)).build()
+                        INSTANCE = Room.databaseBuilder(context.applicationContext,WordRoomDatabase::class.java,context.getString(R.string.dbName))
+                                .addCallback(sRoomDatabaseCallback)
+                                .build()
                     }
                 }
             }
             return INSTANCE!!
+        }
+        private val sRoomDatabaseCallback = object : RoomDatabase.Callback() {
+
+            override fun onOpen(db: SupportSQLiteDatabase) {
+                super.onOpen(db)
+                PopulateDbAsync(INSTANCE!!).execute()
+            }
+        }
+    }
+
+    private class PopulateDbAsync internal constructor(db: WordRoomDatabase) : AsyncTask<Void, Void, Void>() {
+
+        private val mDao: WordDao = db.wordDao()
+
+        override fun doInBackground(vararg params: Void): Void? {
+            mDao.deleteAll()
+            var word = Word("Hello")
+            mDao.insert(word)
+            word = Word("World")
+            mDao.insert(word)
+            return null
         }
     }
 }
